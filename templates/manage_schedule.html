@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="container">
+
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+        <h6 class="border-bottom pb-2 mb-0">今日の授業</h6>
+
+    </div>
+
+
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+
+        <h6 class="border-bottom pb-2 mb-0">個別指導したい時間を選択してください</h6>
+
+        <!-- エラーがあれば表示する -->
+        <p class="lead">{{error}}</p>
+
+        <!-- スケジュール表示部分 -->
+        <form action="" method="POST">{% csrf_token %}
+
+            <!-- 一週間分の日付、時刻リストから半日分の時刻リストを取得 -->
+            {% for date in datetime_list %}
+
+            <!-- ループ回数が偶数回目の時だけ日付を表示する -->
+            {% if forloop.counter0|divisibleby:"2" %}
+            <p class="lead">{{date.0|date:"m月d日"}}</p>
+            {% endif %}
+
+            <div class="d-flex justify-content-left">
+
+                <!-- 半日分の時刻リストから時刻を取得し、ボタンを表示する -->
+                {% for time in date %}
+
+                {% if time.datetime %}
+                <button type="submit" class="btn btn-outline-info" name="datetime" value="{{time.datetime|date:'Y:m:d H:00'}}">{{time.datetime|date:"H:00"}}</button>
+                {% else %}
+                <button type="submit" class="btn btn-info" name="datetime" value="{{time|date:'Y:m:d H:00'}}">{{time|date:"H:00"}}</button>
+                {% endif%}
+
+                {% endfor %}
+
+            </div>
+            {% endfor %}
+
+        </form>
+    </div>
+</main>
+{% endblock content %}

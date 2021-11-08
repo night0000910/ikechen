@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="container">
+    <p class="display-6">講師を始める</p>
+    <!-- ログインフォーム -->>
+    <form action="" method="POST">{% csrf_token %}
+        <div class="col-12">
+            <label for="email" class="form-label">苗字 <span class="text-muted">（オプション）</span></label>
+            <input type="text" class="form-control" id="email" placeholder="" name="last_name">
+        </div>
+        <div class="col-12">
+            <label for="email" class="form-label">名前 <span class="text-muted">（オプション）</span></label>
+            <input type="text" class="form-control" id="email" placeholder="" name="first_name">
+        </div>
+        <div class="col-12">
+            <label for="email" class="form-label">ユーザー名 <span class="text-muted">（オプション）</span></label>
+            <input type="text" class="form-control" id="email" placeholder="" name="username">
+        </div>
+        <div class="col-12">
+            <label for="email" class="form-label">パスワード <span class="text-muted">（オプション）</span></label>
+            <input type="password" class="form-control" id="email" placeholder="" name="password">
+        </div>
+        <button class="w-100 btn btn-lg btn-info" type="submit">サインアップ</button>
+    </form>
+</main>
+{% endblock content %}

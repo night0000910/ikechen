@@ -12,9 +12,8 @@ from . import models
 # ------------------------------便利な関数------------------------------
 
 # getパラメータを加えたurlを作成する
-# reverse_name : 遷移先のページの名前, get_params : getパラメーターを格納した辞書
-def add_getparam_to_url(reverse_name, get_params):
-    reverse_url = reverse(reverse_name) # 遷移先のurl
+# reverse_url : 遷移先のurl, get_params : getパラメーターを格納した辞書
+def add_getparam_to_url(reverse_url, get_params):
     parameters = urlencode(get_params) # クエリ文字列を作る
     url = f"{reverse_url}?{parameters}" # クエリ文字列を含めたurlを作る
 
@@ -82,8 +81,50 @@ def fix_datetime_list(datetime_list):
     
     return datetime_list
 
+# 講師が予約可能な授業のリストを作成する
+def create_teaching_class_list(teaching_class_list):
+    class_list = [] # 半日分の、予約可能な授業のリストのリスト
+    halfday_class_list = [] # 半日分の、予約可能な授業のリスト
+    today = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) # 今日の0時0分
 
+    # halfday_classリストを作成し、class_listに入れる。その後、class_listを初期化する。これを繰り返す。
+    for i in range(today.day, today.day+7):
 
+        # halfday_class_listを作成する
+        for j in range(0, 12):
+
+            for teaching_class in teaching_class_list:
+
+                time_interval = datetime.timedelta(hours=9) # 9時間分のずれ
+                fixed_teaching_datetime = teaching_class.datetime + time_interval # ずれを修正済みの授業時間
+                
+                if fixed_teaching_datetime.day == i and fixed_teaching_datetime.hour == j:
+
+                    halfday_class_list.append(teaching_class)
+        
+        # class_listにhalfday_class_listを追加する
+        class_list.append(halfday_class_list)
+        halfday_class_list = []
+
+        # halfday_class_listを作成する
+        for j in range(12, 24):
+
+            for teaching_class in teaching_class_list:
+
+                time_interval = datetime.timedelta(hours=9) # 9時間分のずれ
+                fixed_teaching_datetime = teaching_class.datetime + time_interval # ずれを修正済みの授業時間
+
+                if fixed_teaching_datetime.day == i and fixed_teaching_datetime.hour == j:
+
+                    halfday_class_list.append(teaching_class)
+        
+        # class_listにhalfcay_class_listを追加する
+        class_list.append(halfday_class_list)
+        halfday_class_list = []
+    
+    return class_list
+
+        
 
 # -------------------------講師・生徒共通のページ-------------------------
 
@@ -116,7 +157,7 @@ def reserve_view(request):
             user = request.user # ログインしているユーザー
             student = models.StudentModel.objects.get(user=user.id) # 現在ログイン中のユーザーのStudentModelオブジェクト
             now_date = datetime.datetime.now() # 現在時刻
-            learning_class_set = models.ClassModel.objects.filter(user=student.id) # 予約した授業ののセット
+            learning_class_set = models.ClassModel.objects.filter(student=student.id) # 予約した授業ののセット
             learning_class_list = change_set_to_list(learning_class_set) # 予約した授業のリスト
             learning_class_list = fix_datetime_list(learning_class_list) # 9時間分の時間のずれを修正する
             today_learning_datetime_list = [] # 今日受ける授業の日付、時刻のリスト
@@ -159,6 +200,7 @@ def reserve_view(request):
         pass
 
 # 授業の時間を選択する
+# teacher_id : 講師のUserModelのid列の値
 def choose_learning_datetime_view(request, teacher_id):
 
     # ユーザーがログインしている場合
@@ -169,14 +211,64 @@ def choose_learning_datetime_view(request, teacher_id):
 
             # GETメソッドの場合
             if request.method == "GET":
+                user = request.user # ログイン中のユーザー
+                student = models.StudentModel.objects.get(user=user.id) # ログイン中のユーザーの生徒オブジェクト
+                teacher = models.TeacherModel.objects.get(user=teacher_id) # 選択した講師
 
-                
+                teaching_class_set = models.ClassModel.objects.filter(teacher=teacher.id) # 選択した講師の、1週間以内の予約可能な授業のセット
+                teaching_class_list = [] # 選択した講師の、1週間以内の予約可能な授業のリスト
+                now_date = datetime.datetime.now() # 現在時刻
 
-                return render(request, )
+                # 今日から1週間以内のまだ予約されていない授業、または自分が予約した授業をteaching_class_listに入れる
+                for teaching_class in teaching_class_set:
+
+                    time_interval = datetime.timedelta(hours=9) # 9時間分のずれ
+                    fixed_teaching_datetime = teaching_class.datetime + time_interval # ずれを修正済みの授業時間
+
+                    if now_date.day <= fixed_teaching_datetime.day <= now_date.day+6 and (teaching_class.student.id == 1 or teaching_class.student.id == student.id):
+
+                        teaching_class_list.append(teaching_class)
+
+                teaching_class_list.sort(key=lambda x:x.datetime.timestamp()) # 予約可能な授業を日付、時刻順に並べ替える
+                teaching_class_list = create_teaching_class_list(teaching_class_list) # teaching_class_listを扱いやすい形に修正する
+
+                # GETメソッドでerrorパラメーターが送られていれば、error変数に代入
+                if request.GET.get("error"):
+                    error = request.GET.get("error")
+
+                # 送られていなければ、error変数に空の文字列を代入
+                else:
+                    error = ""
+
+                return render(request, "choose_learning_datetime.html", {"teaching_class_list" : teaching_class_list, "student" : student, "error" : error})
 
             # POSTメソッドの場合
             elif request.method == "POST":
-                pass
+                user = request.user # ログイン中のユーザー
+                student = models.StudentModel.objects.get(user=user.id) # ログイン中のユーザーの生徒オブジェクト
+                teacher = models.TeacherModel.objects.get(user=teacher_id) # 選択した講師
+                learning_datetime_text = request.POST["learning_datetime"] # 予約した授業の日付、時刻を表したテキスト
+                learning_datetime = datetime.datetime.strptime(learning_datetime_text, "%Y:%m:%d %H:00") # 予約した授業の日付、時刻
+
+                # 生徒が既にその授業を予約しているかどうかを確認
+                duplicate = is_duplicate(models.ClassModel.objects.filter(teacher=teacher_id).filter(datetime=learning_datetime).filter(student=student.id))
+
+                # まだ授業を予約していなければ、ClassModelのstudentに生徒を登録する
+                if not duplicate:
+
+                    learning_class = models.ClassModel.objects.filter(teacher=teacher_id).get(datetime=learning_datetime) # 予約する授業
+                    learning_class.student = student # ClassModelのstudent列にログインしている生徒のオブジェクトを代入
+                    learning_class.save()
+
+                    return redirect("choose_learning_datetime", teacher_id=teacher_id)
+                
+                # 既に授業を予約していれば、登録しない。
+                else:
+                    reverse_url = reverse("choose_learning_datetime", kwargs={"teacher_id" : teacher_id}) # 遷移先のurl
+                    url = add_getparam_to_url(reverse_url, {"error" : "既に予約しています"})
+
+                    return redirect(url)
+
 
         # ユーザーが講師の場合
         elif request.user.user_type == "teacher":
@@ -185,11 +277,6 @@ def choose_learning_datetime_view(request, teacher_id):
     # ログインしていない場合
     else:
         pass
-
-
-
-
-
 
 
 
@@ -281,6 +368,7 @@ def manage_schedule_view(request):
             elif request.method == "POST":
                 user = request.user # ログインしているユーザー
                 teacher = models.TeacherModel.objects.get(user=user.id) # ログイン中のユーザーのTeacherModelインスタンス
+                dummy_student = models.StudentModel.objects.get(id=1) # ダミーの生徒
                 teaching_datetime_text = request.POST["datetime"] # 個別指導できる日付、時刻を表した文字列
                 teaching_datetime = datetime.datetime.strptime(teaching_datetime_text, "%Y:%m:%d %H:00") # 個別指導できる日付、時刻
 
@@ -291,14 +379,15 @@ def manage_schedule_view(request):
                 if not duplicate:
 
                     # 個別指導できる日付、時刻をデータベースに登録
-                    models.ClassModel.objects.create(teacher=teacher, datetime=teaching_datetime)
+                    models.ClassModel.objects.create(student=dummy_student, teacher=teacher, datetime=teaching_datetime)
 
                     # スケジュール管理ページに戻る
                     return redirect("manage_schedule")
                 
                 # 日付、時刻が重複していれば、登録しない。
                 else:
-                    url = add_getparam_to_url("manage_schedule", {"error" : "既に登録されています"})
+                    reverse_url = reverse("manage_schedule") # 遷移先のurl
+                    url = add_getparam_to_url(reverse_url, {"error" : "既に登録されています"})
 
                     # スケジュール管理ページに戻る
                     return  redirect(url)

@@ -13,7 +13,7 @@ USER_TYPE_CHOICES = [("teacher", "teacher"), ("student", "student")]
 # ユーザーのモデル。
 # ユーザーは、講師ユーザーと生徒ユーザーの二種類に分類される。
 # StudentModel, TeacherModelと1対1のリレーションがある
-# id=0のユーザーは、ダミーユーザー。ClassModelにおいて、生徒がまだ決まっていないことを示す。
+# id=1のユーザーは、ダミーユーザー。ClassModelにおいて、生徒がまだ決まっていないことを示す。
 class UserModel(AbstractUser):
     user_type = models.TextField(choices=USER_TYPE_CHOICES, default="student") # ユーザーが講師か生徒かを示す
     first_name = models.TextField(default="") # ユーザーの名前
@@ -35,7 +35,7 @@ class TeacherModel(models.Model):
 # 授業のモデル
 # StudentModel, TeacherModelと1対多のリレーションがある
 class ClassModel(models.Model):
-    student = models.ForeignKey(StudentModel, on_delete=models.CASCADE, default=0) # 生徒ユーザー
+    student = models.ForeignKey(StudentModel, on_delete=models.CASCADE) # 生徒ユーザー
     teacher = models.ForeignKey(TeacherModel, on_delete=models.CASCADE) # 講師ユーザー
     datetime = models.DateTimeField() # 授業の日付、時刻
 

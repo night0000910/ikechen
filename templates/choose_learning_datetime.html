@@ -1,5 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
+<main class="container">
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+        <h6 class="border-bottom pb-2 mb-0">予約したい時間を選択してください</h6>
 
+        <!-- エラーがあれば表示する -->
+        <p class="lead">{{error}}</p>
+
+        <!-- 予約可能な授業を表示 -->
+        <form action="" method="POST">{% csrf_token %}
+
+            <!-- 予約可能な授業のリストから、半日分の授業のリストを取得する -->
+            {% for halfday_teaching_class_list in teaching_class_list %}
+
+            <!-- ループ回数が偶数回目の時だけ日付を表示する -->
+            {% if forloop.counter0|divisibleby:"2" %}
+            <p class="lead">{{halfday_teaching_class_list.0.datetime|date:"m月d日"}}</p>
+            {% endif %}
+
+            <div class="d-flex justify-content-left">
+
+                <!-- 半日分の授業リストから授業を取得し、ボタンを表示する -->
+                {% for teaching_class in halfday_teaching_class_list %}
+
+                <!-- teaching_class.student.idがログイン中の生徒のidと一致していれば -->
+                {% if teaching_class.student.id == student.id %}
+                <button type="submit" class="btn btn-outline-info" name="learning_datetime" value="{{teaching_class.datetime|date:'Y:m:d H:00'}}">{{teaching_class.datetime|date:"H:00"}}</button>
+
+                <!-- teaching_class.student.idがログイン中の生徒のidと一致していなければ -->
+                {% else %}
+                <button type="submit" class="btn btn-info" name="learning_datetime" value="{{teaching_class.datetime|date:'Y:m:d H:00'}}">{{teaching_class.datetime|date:"H:00"}}</button>
+                {% endif %}
+                
+                {% endfor %}
+            
+            </div>
+
+            {% endfor %}
+        
+        </form>
+
+    </div>
+</main>
 {% endblock content %}

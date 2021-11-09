@@ -12,25 +12,25 @@
         <form action="" method="POST">{% csrf_token %}
 
             <!-- 予約可能な授業のリストから、半日分の授業のリストを取得する -->
-            {% for halfday_teaching_class_list in teaching_class_list %}
+            {% for halfday_teachers_class_list in weekly_teachers_class_list %}
 
             <!-- ループ回数が偶数回目の時だけ日付を表示する -->
             {% if forloop.counter0|divisibleby:"2" %}
-            <p class="lead">{{halfday_teaching_class_list.0.datetime|date:"m月d日"}}</p>
+            <p class="lead">{{halfday_teachers_class_list.0.datetime|date:"m月d日"}}</p>
             {% endif %}
 
             <div class="d-flex justify-content-left">
 
                 <!-- 半日分の授業リストから授業を取得し、ボタンを表示する -->
-                {% for teaching_class in halfday_teaching_class_list %}
+                {% for teachers_class in halfday_teachers_class_list %}
 
-                <!-- teaching_class.student.idがログイン中の生徒のidと一致していれば -->
-                {% if teaching_class.student.id == student.id %}
-                <button type="submit" class="btn btn-outline-info" name="learning_datetime" value="{{teaching_class.datetime|date:'Y:m:d H:00'}}">{{teaching_class.datetime|date:"H:00"}}</button>
+                <!-- teachers_class.student.idがログイン中の生徒のidと一致していれば -->
+                {% if teachers_class.student.id == student.id %}
+                <button type="submit" class="btn btn-outline-info" name="reserved_class_datetime" value="{{teachers_class.datetime|date:'Y:m:d H:00'}}">{{teachers_class.datetime|date:"H:00"}}</button>
 
-                <!-- teaching_class.student.idがログイン中の生徒のidと一致していなければ -->
+                <!-- teachers_class.student.idがログイン中の生徒のidと一致していなければ -->
                 {% else %}
-                <button type="submit" class="btn btn-info" name="learning_datetime" value="{{teaching_class.datetime|date:'Y:m:d H:00'}}">{{teaching_class.datetime|date:"H:00"}}</button>
+                <button type="submit" class="btn btn-info" name="reserved_class_datetime" value="{{teachers_class.datetime|date:'Y:m:d H:00'}}">{{teachers_class.datetime|date:"H:00"}}</button>
                 {% endif %}
                 
                 {% endfor %}

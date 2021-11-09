@@ -7,18 +7,18 @@
         <h6 class="border-bottom pb-2 mb-0">今日の授業</h6>
 
         <!-- 今日行う授業を表示する -->
-        {% for teaching_class in today_teaching_class_list %}
+        {% for teachers_class in todays_teachers_class_list %}
         <div class="d-flex text-muted pt-3">
-            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="0" height="0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><img src="{{teaching_class.student.user.profile_image.url}}" width="38" height="38"></svg>
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="0" height="0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><img src="{{teachers_class.student.user.profile_image.url}}" width="38" height="38"></svg>
             <p class="pb-3 mb-0 small lh-sm border-bottom">
-              <strong class="d-block text-gray-dark">{{teaching_class.student.user.first_name}} {{teaching_class.student.user.last_name}}</strong>
+              <strong class="d-block text-gray-dark">{{teachers_class.student.user.first_name}} {{teachers_class.student.user.last_name}}</strong>
               <br>
               <br>
-              時間 : {{teaching_class.datetime|date:"H時00分〜"}}
+              時間 : {{teachers_class.datetime|date:"H時00分〜"}}
               <br>
               <br>
               <!-- 現在時刻が授業の時間と一致していれば、「授業を開始する」ボタンを表示する -->
-              {% if teaching_class.datetime.hour == now_date.hour and teaching_class.datetime.minute < 50 %}
+              {% if teachers_class.datetime.hour == now_date.hour and now_date.minute < 50 %}
               <a href="#" class="btn btn-outline-warning">授業を開始する</a>
               {% endif %}
             </p>
@@ -39,22 +39,22 @@
         <form action="" method="POST">{% csrf_token %}
 
             <!-- 一週間分の日付、時刻リストから半日分の時刻リストを取得 -->
-            {% for date in datetime_list %}
+            {% for halfday_time_list in weekly_datetime_list %}
 
             <!-- ループ回数が偶数回目の時だけ日付を表示する -->
             {% if forloop.counter0|divisibleby:"2" %}
-            <p class="lead">{{date.0|date:"m月d日"}}</p>
+            <p class="lead">{{halfday_time_list.0|date:"m月d日"}}</p>
             {% endif %}
 
             <div class="d-flex justify-content-left">
 
                 <!-- 半日分の時刻リストから時刻を取得し、ボタンを表示する -->
-                {% for time in date %}
+                {% for time in halfday_time_list %}
 
                 {% if time.datetime %}
-                <button type="submit" class="btn btn-outline-info" name="datetime" value="{{time.datetime|date:'Y:m:d H:00'}}">{{time.datetime|date:"H:00"}}</button>
+                <button type="submit" class="btn btn-outline-info" name="teachers_class_datetime" value="{{time.datetime|date:'Y:m:d H:00'}}">{{time.datetime|date:"H:00"}}</button>
                 {% else %}
-                <button type="submit" class="btn btn-info" name="datetime" value="{{time|date:'Y:m:d H:00'}}">{{time|date:"H:00"}}</button>
+                <button type="submit" class="btn btn-info" name="teachers_class_datetime" value="{{time|date:'Y:m:d H:00'}}">{{time|date:"H:00"}}</button>
                 {% endif%}
 
                 {% endfor %}

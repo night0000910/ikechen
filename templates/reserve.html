@@ -8,18 +8,18 @@
         <h6 class="border-bottom pb-2 mb-0">今日の授業</h6>
 
         <!-- 今日受ける授業を表示する -->
-        {% for learning_class in today_learning_class_list %}
+        {% for reserved_class in todays_reserved_class_list %}
         <div class="d-flex text-muted pt-3">
-            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="0" height="0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><img src="{{learning_class.teacher.user.profile_image.url}}" width="38" height="38"></svg>
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="0" height="0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><img src="{{reserved_class.teacher.user.profile_image.url}}" width="38" height="38"></svg>
             <p class="pb-3 mb-0 small lh-sm border-bottom">
-              <strong class="d-block text-gray-dark">{{learning_class.teacher.user.first_name}} {{learning_class.teacher.user.last_name}}</strong>
+              <strong class="d-block text-gray-dark">{{reserved_class.teacher.user.first_name}} {{reserved_class.teacher.user.last_name}}</strong>
               <br>
               <br>
-              時間 : {{learning_class.datetime|date:"H時00分〜"}}
+              時間 : {{reserved_class.datetime|date:"H時00分〜"}}
               <br>
               <br>
               <!-- 現在時刻が授業の時間と一致していれば、「授業を開始する」ボタンを表示する -->
-              {% if learning_class.datetime.hour == now_date.hour and learning_class.datetime.minute < 50 %}
+              {% if reserved_class.datetime.hour == now_date.hour and now_date.minute < 50 %}
               <a href="#" class="btn btn-outline-warning">授業を開始する</a>
               {% endif %}
             </p>
@@ -35,9 +35,9 @@
         <!-- 1週間以内に予約可能な講師を表示する -->
         {% for teacher in teacher_list %}
         <div class="d-flex text-muted pt-3">
-            <a href="{% url 'choose_learning_datetime' teacher.user.id %}"><svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="0" height="0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><img src="{{teacher.user.profile_image.url}}" width="38" height="38"></svg></a>
+            <a href="{% url 'choose_reserved_class_datetime' teacher.user.id %}"><svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="0" height="0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><img src="{{teacher.user.profile_image.url}}" width="38" height="38"></svg></a>
             <p class="pb-3 mb-0 small lh-sm border-bottom">
-              <a href="{% url 'choose_learning_datetime' teacher.user.id %}"><strong class="d-block text-gray-dark">{{teacher.user.first_name}} {{teacher.user.last_name}}</strong></a>
+              <a href="{% url 'choose_reserved_class_datetime' teacher.user.id %}"><strong class="d-block text-gray-dark">{{teacher.user.first_name}} {{teacher.user.last_name}}</strong></a>
             </p>
         </div>
         {% endfor %}

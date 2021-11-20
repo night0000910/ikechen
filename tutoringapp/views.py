@@ -11,11 +11,6 @@ from . import models
 
 # --------------------------------関数-------------------------------
 
-# --------バリデーション用の関数--------
-
-
-# --------機能を抽出した関数--------
-
 # getパラメータを加えたurlを作成する
 # reverse_url : 遷移先のurl, get_params : getパラメーターを格納した辞書
 def add_getparam_to_url(reverse_url, get_params):
@@ -130,6 +125,9 @@ def home_page_view(request):
 def login_view(request):
     pass
 
+def tutoring_view(request):
+    user = request.user
+    return render(request, "tutoring.html", {"username" : user.username})
 
 
 # ---------------------------生徒専用のページ----------------------------

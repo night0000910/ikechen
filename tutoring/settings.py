@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "tutoringapp.apps.TutoringappConfig",
-    "zoomapp.apps.ZoomappConfig",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -132,3 +132,11 @@ AUTH_USER_MODEL = "tutoringapp.UserModel"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ASGI_APPLICATION = "tutoring.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default" : {
+        "BACKEND" : "channels.layers.InMemoryChannelLayer"
+    }
+}

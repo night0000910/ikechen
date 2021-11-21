@@ -1,6 +1,6 @@
 from django.http import response
 from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, logout
 from django.urls import reverse
 
 import datetime as datetime
@@ -77,18 +77,28 @@ def create_weekly_datetime_list():
 # 元のリストから半日分の授業を束ねたリストを含むリストを作成する
 def fix_weekly_teachers_class_list(weekly_teachers_class_list):
     weekly_teachers_class_list.sort(key=lambda x:x.datetime.timestamp())
+    print(weekly_teachers_class_list)
     new_weekly_teachers_class_list = []
     halfday_teachers_class_list = [] 
     today = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) # 今日の0時0分
     zero_oclock = 0
-    twelve_oclock = 12
+    three_oclock = 3
+    fifteen_oclock = 15
     twenty_four_oclock = 24
 
     # 半日分の授業を束ねたリストを作成し、一週間分の授業リストに入れる。これを繰り返す。
     for i in range(today.day, today.day+7):
 
         # 半日分の授業のリストを作成
-        for j in range(zero_oclock, twelve_oclock):
+        for j in range(fifteen_oclock, twenty_four_oclock):
+
+            for teachers_class in weekly_teachers_class_list:
+                
+                if teachers_class.datetime.day == i and teachers_class.datetime.hour == j:
+
+                    halfday_teachers_class_list.append(teachers_class)
+            
+        for j in range(zero_oclock, three_oclock):
 
             for teachers_class in weekly_teachers_class_list:
                 
@@ -100,7 +110,7 @@ def fix_weekly_teachers_class_list(weekly_teachers_class_list):
         halfday_teachers_class_list = []
 
         # 半日分の授業のリストを作成
-        for j in range(twelve_oclock, twenty_four_oclock):
+        for j in range(three_oclock, fifteen_oclock):
 
             for teachers_class in weekly_teachers_class_list:
 
@@ -123,18 +133,83 @@ def home_page_view(request):
 
 # ログインページ
 def login_view(request):
-    pass
 
-def tutoring_view(request):
-    user = request.user
-    return render(request, "tutoring.html", {"username" : user.username})
+    if request.method == "GET":
+        return render(request, "login.html")
+
+    elif request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+
+        
+
+# 条件を満たしていれば、ビデオチャットを始める
+# 条件 : urlに含まれるclass_idの授業が授業時間内であり、リクエスト元のユーザーがその授業の生徒または講師
+def tutoring_view(request, class_id):
+
+    if request.user.is_authenticated:
+        user = request.user
+        reserved_class_set = models.ClassModel.objects.filter(id=class_id)
+        reserved_class_list = change_set_to_list(reserved_class_set)
+        now_date = datetime.datetime.utcnow()
+
+        if reserved_class_list:
+            reserved_class = reserved_class_list[0]
+
+            if reserved_class.datetime.day == now_date.day and reserved_class.datetime.hour == now_date.hour and now_date.minute < 50 and (reserved_class.student.user.id == user.id or reserved_class.teacher.user.id == user.id):
+                
+                return render(request, "tutoring.html", {"username" : user.username})
+        
+        return redirect("manage_schedule")
+    
+    else:
+        return redirect("login")
 
 
 # ---------------------------生徒専用のページ----------------------------
 
 # 生徒アカウント作成ページ
 def signup_studentaccount_view(request):
-    pass
+    
+    if request.method == "GET":
+
+        if request.GET.get("error"):
+            error = request.GET.get("error")
+        else:
+            error = ""
+
+        return render(request, "signup_studentaccount.html", {"error" : error})
+
+    elif request.method == "POST":
+        first_name = request.POST["first_name"]
+        last_name = request.POST["last_name"]
+        username = request.POST["username"]
+        password = request.POST["password"]
+        type = "student"
+
+        user_set = get_user_model().objects.filter(username=username) # ユーザーモデルの、ユーザー名と一致した行のセット
+        
+        # ユーザー名の重複を調べる
+        duplicate = is_duplicate(user_set)
+
+        # ユーザー名の重複がなければ、登録する。その後、ログイン画面へ遷移する。
+        if not duplicate:
+            user = get_user_model().objects.create_user(username, "", password)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.type = type
+            user.save()
+
+            models.StudentModel.objects.create(user=user)
+
+            return redirect("login")
+
+        # 重複があれば、登録しない。アカウント登録画面へ戻る。
+        else:
+            redirect_url = reverse("signup_studentaccount")
+            get_params = {"error" : "既に同じ名前のユーザーが存在しています"}
+            url = add_getparam_to_url(redirect_url, get_params)
+            return redirect(url)
 
 # 予約した授業を表示
 # どの先生の授業を予約するかを決める
@@ -185,7 +260,7 @@ def reserve_view(request):
 
     # ログインしていない場合
     else:
-        pass
+        return redirect("login")
 
 # 授業の時間を選択する
 # teacher_id : 講師のUserModelのid列の値
@@ -255,7 +330,7 @@ def choose_reserved_class_datetime_view(request, teacher_id):
 
     # ログインしていない場合
     else:
-        pass
+        return redirect("login")
 
 
 
@@ -265,7 +340,13 @@ def choose_reserved_class_datetime_view(request, teacher_id):
 def signup_teacheraccount_view(request):
 
     if request.method == "GET":
-        return render(request, "signup_teacheraccount.html")
+
+        if request.GET.get("error"):
+            error = request.GET.get("error")
+        else:
+            error = ""
+
+        return render(request, "signup_teacheraccount.html", {"error" : error})
     
     elif request.method == "POST":
         first_name = request.POST["first_name"]
@@ -293,7 +374,10 @@ def signup_teacheraccount_view(request):
 
         # 重複があれば、登録しない。アカウント登録画面へ戻る。
         else:
-            return render(request, "signup_teacheraccount.html")
+            redirect_url = reverse("signup_teacheraccount")
+            get_params = {"error" : "既に同じ名前のユーザーが存在しています"}
+            url = add_getparam_to_url(redirect_url, get_params)
+            return redirect(url)
 
 # 今日行う予定の授業を表示
 # スケジュールを管理する
@@ -370,7 +454,7 @@ def manage_schedule_view(request):
         # ユーザーが生徒の場合
         elif request.user.user_type == "student":
             pass
-
-    # ユーザーがログインしていない場合
+    
+    # ログインしていない場合
     else:
-        pass
+        return redirect("login")

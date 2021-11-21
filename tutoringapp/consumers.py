@@ -7,7 +7,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         # クラスidに変更する
-        self.room_group_name = "Tutoring-room"
+        class_id = self.scope["url_route"]["kwargs"]["class_id"]
+        self.room_group_name = class_id
 
         await self.channel_layer.group_add(
             self.room_group_name,

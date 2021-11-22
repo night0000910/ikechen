@@ -1,6 +1,6 @@
 from django.http import response
 from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.urls import reverse
 
 import datetime as datetime
@@ -42,6 +42,25 @@ def is_duplicate(record_set):
     else:
         return False
 
+# StudentModelのid=1の列に、ダミーの生徒を作成する
+def create_dummy_student():
+    student_set = models.StudentModel.objects.filter(id=1)
+    student_list = change_set_to_list(student_set)
+    username = "dummy_student"
+    password = "password"
+
+    if student_list:
+        return
+    
+    else:
+        user = get_user_model.objects.create_user(username, "", password)
+        user.first_name = "dummy"
+        user.last_name = "student"
+        user.user_type = "student"
+        user.save()
+
+        models.StudentModel.objects.create(user)
+
 # 一週間分の日付と時刻のリストを作成する
 def create_weekly_datetime_list():
     weekly_datetime_list = [] 
@@ -77,7 +96,6 @@ def create_weekly_datetime_list():
 # 元のリストから半日分の授業を束ねたリストを含むリストを作成する
 def fix_weekly_teachers_class_list(weekly_teachers_class_list):
     weekly_teachers_class_list.sort(key=lambda x:x.datetime.timestamp())
-    print(weekly_teachers_class_list)
     new_weekly_teachers_class_list = []
     halfday_teachers_class_list = [] 
     today = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) # 今日の0時0分
@@ -135,13 +153,38 @@ def home_page_view(request):
 def login_view(request):
 
     if request.method == "GET":
-        return render(request, "login.html")
+
+        if request.GET.get("error"):
+            error = request.GET.get("error")
+        else:
+            error = ""
+
+        return render(request, "login.html", {"error" : error})
 
     elif request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
 
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            
+            if user.user_type == "student":
+                return redirect("reserve")
+            
+            elif user.user_type == "teacher":
+                return redirect("manage_schedule")
         
+        else:
+            redirect_url = reverse("login")
+            get_params = {"error" : "ログインに失敗しました"}
+            url = add_getparam_to_url(redirect_url, get_params)
+            return redirect(url)
+
+def logout_view(request):
+    logout(request)
+    return redirect("login")   
 
 # 条件を満たしていれば、ビデオチャットを始める
 # 条件 : urlに含まれるclass_idの授業が授業時間内であり、リクエスト元のユーザーがその授業の生徒または講師
@@ -181,6 +224,10 @@ def signup_studentaccount_view(request):
         return render(request, "signup_studentaccount.html", {"error" : error})
 
     elif request.method == "POST":
+
+        # ダミーの生徒を作成する
+        create_dummy_student()
+
         first_name = request.POST["first_name"]
         last_name = request.POST["last_name"]
         username = request.POST["username"]
@@ -256,7 +303,7 @@ def reserve_view(request):
     
     # 講師の場合
     elif request.user.is_authenticated and request.user.user_type == "teacher":
-        pass
+        return redirect("manage_schedule")
 
     # ログインしていない場合
     else:
@@ -326,7 +373,7 @@ def choose_reserved_class_datetime_view(request, teacher_id):
     
     # 講師の場合
     elif request.user.is_authenticated and request.user.user_type == "teacher":
-        pass
+        return redirect("manage_schedule")
 
     # ログインしていない場合
     else:
@@ -428,6 +475,10 @@ def manage_schedule_view(request):
             return render(request, "manage_schedule.html", {"weekly_datetime_list" : weekly_datetime_list, "todays_teachers_class_list" : todays_teachers_class_list, "teachers_class_list" : teachers_class_list, "error" : error, "now_date" : now_date})
 
         elif request.method == "POST":
+
+            # ダミーの生徒を作成する
+            create_dummy_student()
+
             user = request.user
             teacher = models.TeacherModel.objects.get(user=user.id) 
             dummy_student = models.StudentModel.objects.get(id=1) 
@@ -451,9 +502,9 @@ def manage_schedule_view(request):
 
                 return  redirect(url)
 
-        # ユーザーが生徒の場合
-        elif request.user.user_type == "student":
-            pass
+    # ユーザーが生徒の場合
+    elif request.user.user_type == "student":
+            return redirect("reserve")
     
     # ログインしていない場合
     else:

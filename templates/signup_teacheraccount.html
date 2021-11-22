@@ -7,22 +7,36 @@
     <!-- ログインフォーム -->
     <form action="" method="POST">{% csrf_token %}
         <div class="col-12">
-            <label for="email" class="form-label">苗字 <span class="text-muted">（オプション）</span></label>
+            <label for="email" class="form-label">苗字 <span class="text-muted"></span></label>
             <input type="text" class="form-control" id="email" placeholder="" name="last_name" required>
         </div>
         <div class="col-12">
-            <label for="email" class="form-label">名前 <span class="text-muted">（オプション）</span></label>
+            <label for="email" class="form-label">名前 <span class="text-muted"></span></label>
             <input type="text" class="form-control" id="email" placeholder="" name="first_name" required>
         </div>
         <div class="col-12">
-            <label for="email" class="form-label">ユーザー名 <span class="text-muted">（オプション）</span></label>
+            <label for="email" class="form-label">ユーザー名 <span class="text-muted"></span></label>
             <input type="text" class="form-control" id="email" placeholder="" name="username" required>
         </div>
         <div class="col-12">
-            <label for="email" class="form-label">パスワード <span class="text-muted">（オプション）</span></label>
+            <label for="email" class="form-label">パスワード <span class="text-muted"></span></label>
             <input type="password" class="form-control" id="email" placeholder="" name="password" required>
         </div>
         <button class="w-100 btn btn-lg btn-info" type="submit">サインアップ</button>
     </form>
+    <div class="d-flex flex-row bd-highlight mb-3">
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text">既に登録されている方はこちら</p>
+                <a href="{% url 'login' %}" class="btn btn-outline-warning">ログイン</a>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+              <p class="card-text">個別指導を受けたい方はこちら</p>
+              <a href="{% url 'signup_studentaccount' %}" class="btn btn-outline-warning">アカウントの作成</a>
+            </div>
+        </div>
+    </div>
 </main>
 {% endblock content %}

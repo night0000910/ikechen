@@ -7,14 +7,22 @@
     <!-- ログインフォーム -->
     <form action="" method="POST">{% csrf_token %}
         <div class="col-12">
-            <label for="email" class="form-label">ユーザー名 <span class="text-muted">（オプション）</span></label>
+            <label for="email" class="form-label">ユーザー名 <span class="text-muted"></span></label>
             <input type="text" class="form-control" id="email" placeholder="" name="username" required>
         </div>
         <div class="col-12">
-            <label for="email" class="form-label">パスワード <span class="text-muted">（オプション）</span></label>
+            <label for="email" class="form-label">パスワード <span class="text-muted"></span></label>
             <input type="password" class="form-control" id="email" placeholder="" name="password" required>
         </div>
         <button class="w-100 btn btn-lg btn-info" type="submit">ログイン</button>
     </form>
+    <div class="d-flex flex-row bd-highlight mb-3">
+        <div class="card">
+            <div class="card-body">
+              <p class="card-text">アカウントを作成していない方はこちら</p>
+              <a href="{% url 'signup_studentaccount' %}" class="btn btn-outline-warning">アカウントを作成</a>
+            </div>
+        </div>
+    </div>
 </main>
 {% endblock content %}

@@ -1,5 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
+from channels.db import database_sync_to_async
 
 import json
 import datetime
@@ -8,6 +9,47 @@ import asyncio
 
 from . import models
 
+
+# 授業開始時刻をデータベースに記録する
+@database_sync_to_async
+def update_class_start_datetime(user_id):
+    now_date = datetime.datetime.utcnow()
+    user = get_user_model().objects.get(id=user_id)
+    user.class_start_datetime = now_date
+    user.save()
+
+# 授業終了時刻をデータベースに記録する
+@database_sync_to_async
+def update_class_ending_datetime(user_id):
+    now_date = datetime.datetime.utcnow()
+    user = get_user_model().objects.get(id=user_id)
+    user.class_ending_datetime = now_date
+    user.save()
+
+# 授業に費やした時間をデータベースに記録する
+@database_sync_to_async
+def update_spent_time(user_id):
+    user = get_user_model().objects.get(id=user_id)
+    spent_time = user.class_ending_datetime - user.class_start_datetime
+    user.spent_time += math.floor(spent_time.seconds/60)
+    user.save()
+
+# ランクを更新する
+@database_sync_to_async
+def update_rank(user_id):
+    user = get_user_model().objects.get(id=user_id)
+    spent_time = user.spent_time
+
+    if spent_time < 1500:
+        user.rank = "bronze"
+    elif 1500 <= spent_time < 3000:
+        user.rank = "silver"
+    elif 3000 <= spent_time < 4500:
+        user.rank = "gold"
+    elif spent_time >= 4500:
+        user.rank = "diamond"
+
+    user.save()
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
@@ -22,14 +64,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
 
-        # 授業開始時刻をデータベースに記録する
-        now_date = await asyncio.get_event_loop(None, datetime.datetime.utcnow)
-        print(now_date)
         user_id = self.scope["url_route"]["kwargs"]["user_id"]
-        user = get_user_model().objects.get(id=user_id)
-        user.class_start_datetime = now_date
-        user.save()
-    
+        await update_class_start_datetime(user_id)
+
     async def disconnect(self, close_code):
 
         await self.channel_layer.group_discard(
@@ -39,14 +76,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         print("通信が切断されました")
 
-        # 授業開始時刻、授業時間をデータベースに記録する
-        now_date = datetime.datetime.utcnow()
         user_id = self.scope["url_route"]["kwargs"]["user_id"]
-        user = get_user_model().objects.get(id=user_id)
-        user.class_ending_datetime = now_date
-        time_interval = user.class_ending_datetime - user.class_start_datetime
-        user.spent_time += math.floor(time_interval.seconds/60)
-        user.save()
+        await update_class_ending_datetime(user_id)
+        await update_spent_time(user_id)
+        await update_rank(user_id)
 
     async def receive(self, text_data):
 

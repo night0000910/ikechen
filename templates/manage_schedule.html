@@ -42,7 +42,7 @@
               <br>
               <br>
               <!-- 現在時刻が授業の時間と一致していれば、「授業を開始する」ボタンを表示する -->
-              {% if teachers_class.datetime.hour == now_date.hour and now_date.minute < 50 %}
+              {% if teachers_class.datetime.hour == now.hour and now.minute < 50 %}
               <a href="{% url 'tutoring' teachers_class.id %}" class="btn btn-outline-warning">授業を開始する</a>
               {% endif %}
             </p>
@@ -65,21 +65,21 @@
             <!-- 一週間分の日付、時刻リストから半日分の時刻リストを取得 -->
             {% for halfday_time_list in weekly_datetime_list %}
 
-            <!-- ループ回数が偶数回目の時だけ日付を表示する -->
-            {% if forloop.counter0|divisibleby:"2" %}
-            <p class="lead">{{halfday_time_list.0|date:"m月d日"}}</p>
-            {% endif %}
+                <!-- ループ回数が偶数回目の時だけ日付を表示する -->
+                {% if forloop.counter0|divisibleby:"2" %}
+                <p class="lead">{{halfday_time_list.0|date:"m月d日"}}</p>
+                {% endif %}
 
             <div class="d-flex justify-content-left">
 
                 <!-- 半日分の時刻リストから時刻を取得し、ボタンを表示する -->
                 {% for time in halfday_time_list %}
 
-                {% if time.datetime %}
-                <button type="submit" class="btn btn-outline-info" name="teachers_class_datetime" value="{{time.datetime|date:'Y:m:d H:00'}}">{{time.datetime|date:"H:00"}}</button>
-                {% else %}
-                <button type="submit" class="btn btn-info" name="teachers_class_datetime" value="{{time|date:'Y:m:d H:00'}}">{{time|date:"H:00"}}</button>
-                {% endif%}
+                    {% if time.datetime %}
+                    <button type="submit" class="btn btn-outline-info" name="teachers_class_datetime" value="{{time.datetime|date:'Y:m:d H:00'}}">{{time.datetime|date:"H:00"}}</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-info" name="teachers_class_datetime" value="{{time|date:'Y:m:d H:00'}}">{{time|date:"H:00"}}</button>
+                    {% endif%}
 
                 {% endfor %}
 

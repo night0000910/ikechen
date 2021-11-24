@@ -1,6 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
+from django.utils import timezone
 
 import json
 import datetime
@@ -13,17 +14,17 @@ from . import models
 # 授業開始時刻をデータベースに記録する
 @database_sync_to_async
 def update_class_start_datetime(user_id):
-    now_date = datetime.datetime.utcnow()
+    now = timezone.now()
     user = get_user_model().objects.get(id=user_id)
-    user.class_start_datetime = now_date
+    user.class_start_datetime = now
     user.save()
 
 # 授業終了時刻をデータベースに記録する
 @database_sync_to_async
 def update_class_ending_datetime(user_id):
-    now_date = datetime.datetime.utcnow()
+    now = timezone.now()
     user = get_user_model().objects.get(id=user_id)
-    user.class_ending_datetime = now_date
+    user.class_ending_datetime = now
     user.save()
 
 # 授業に費やした時間をデータベースに記録する

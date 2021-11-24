@@ -1,26 +1,41 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block header %}
+<link href="{% static 'tutoring.css' %}" rel="stylesheet">
+{% endblock header %}
+
 {% block content %}
 <main class="container">
     <div class="my-3 p-3 bg-white rounded shadow-sm">
         <div class="main-grid-container">
+            <input id="user-id" type="hidden" value="{{user.id}}">
             <input id="username" type="hidden" value="{{username}}">
             <!--ビデオを表示-->
             <div id="video-container">
-                <div><video id="local-video" style="float: left" autoplay playsinline></video></div>
-                <button id="btn-toggle-video">カメラをオフ</button>
-                <button id="btn-toggle-audio">ミュート</button>
+                <div><video id="local-video" width="200" height="150" autoplay playsinline></video></div>
             </div>
+            <button id="btn-toggle-video" class="btn btn-outline-warning">カメラをオフ</button>
+            <button id="btn-toggle-audio" class="btn btn-outline-warning">ミュート</button>
 
             <!--チャットを表示-->
-            <div id="chat">
-                <h3>チャット</h3>
-                <div id="messages">
-                    <ul id="message-list"></ul>
+            <div class="d-flex flex-row bd-highlight mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">チャット</h5>
+                    </div>
+                    <div class="card-body">
+    
+                        <div id="chat">
+                            <div id="messages">
+                                <ul id="message-list"></ul>
+                            </div>
+            
+                            <div><input id="msg" class="form-control"><button id="btn-send-msg" class="btn btn-outline-info">メッセージを送信</button></div>
+                        </div>
+    
+                    </div>
                 </div>
-
-                <div><input id="msg"><button id="btn-send-msg">メッセージを送信</button></div>
             </div>
         </div>
     </div>

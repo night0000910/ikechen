@@ -3,7 +3,25 @@
 {% block content %}
 <main class="container">
     <div class="my-3 p-3 bg-white rounded shadow-sm">
-        <h6 class="border-bottom pb-2 mb-0">予約したい時間を選択してください</h6>
+        <h3 class="border-bottom pb-2 mb-0">{{teacher.last_name}} {{teacher.first_name}}</h3>
+        <img src={{teacher.profile_image.url}} width="200" height=200">
+
+        {% if teacher.rank == "bronze" %}
+        <p class="lead">ランク : <span style="color: #BC9E69;">ブロンズ</span></p>
+        {% elif teacher.rank == "silver" %}
+        <p class="lead">ランク : <span style="color: #BEC1C3;">シルバー</span></p>
+        {% elif teacher.rank == "gold" %}
+        <p class="lead">ランク : <span style="color: #EFC986;">ゴールド</span></p>
+        {% elif teacher.rank == "diamond" %}
+        <p class="lead"><span style="color: #94D1C8;">ダイヤモンド</span></p>
+        {% endif %}
+
+        <p class="lead">経歴 : {{elapsed_year}}</p>
+        <p class="lead">{{teacher.self_introduction}}</p>
+    </div>
+
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+        <h5 class="border-bottom pb-2 mb-0">予約したい時間を選択してください</h5>
 
         <!-- エラーがあれば表示する -->
         <p class="lead">{{error}}</p>

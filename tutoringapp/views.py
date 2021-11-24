@@ -2,6 +2,7 @@ from django.http import response
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.urls import reverse
+from dateutil.relativedelta import relativedelta
 
 import datetime as datetime
 from urllib.parse import urlencode
@@ -53,13 +54,13 @@ def create_dummy_student():
         return
     
     else:
-        user = get_user_model.objects.create_user(username, "", password)
-        user.first_name = "dummy"
-        user.last_name = "student"
+        user = get_user_model().objects.create_user(username, "", password)
+        user.last_name = "dummy"
+        user.first_name = "student"
         user.user_type = "student"
         user.save()
 
-        models.StudentModel.objects.create(user)
+        models.StudentModel.objects.create(user=user)
 
 # 一週間分の日付と時刻のリストを作成する
 def create_weekly_datetime_list():
@@ -182,9 +183,74 @@ def login_view(request):
             url = add_getparam_to_url(redirect_url, get_params)
             return redirect(url)
 
+# ログアウトページ
 def logout_view(request):
     logout(request)
-    return redirect("login")   
+    return redirect("login")
+
+# ユーザーのプロフィールを表示する
+def profile_view(request, user_id):
+
+    if request.user.is_authenticated:
+        referred_user = get_user_model().objects.get(id=user_id)
+        now_date = datetime.datetime.now(datetime.timezone.utc)
+        elapsed_time = relativedelta(now_date, referred_user.start_datetime)
+
+        if elapsed_time.year is not None:
+            elapsed_year = f"{elapsed_time.year}年"
+        else:
+            elapsed_year = "1年未満"
+
+        return render(request, "profile.html", {"referred_user" : referred_user, "elapsed_year" : elapsed_year})
+    
+    else:
+        return redirect("login")
+
+# アカウントを設定する
+def setup_account_view(request):
+    
+    if request.user.is_authenticated:
+
+        if request.method == "GET":
+            
+            return render(request, "setup_account.html")
+        
+        elif request.method == "POST":
+            user = request.user
+
+            # request.POST["setup"]には値が格納されていない
+            
+            # プロフィール画像を変更する場合
+            if request.POST["setup"] == "change_profile_image":
+
+                profile_image = request.FILES["profile_image"]
+                user.profile_image = profile_image
+                user.save()
+
+                return redirect("setup_account")
+
+            # 名前を変更する場合
+            elif request.POST["setup"] == "change_name":
+
+                first_name = request.POST["first_name"]
+                last_name = request.POST["last_name"]
+                user.first_name = first_name
+                user.last_name = last_name
+                user.save()
+
+                return redirect("setup_account")
+
+            # 自己紹介を編集する場合
+            elif request.POST["setup"] == "edit_self_introduction":
+
+                self_introduction = request.POST["self_introduction"]
+                user.self_introduction = self_introduction
+                user.save()
+
+                return redirect("setup_account")
+
+    else:
+        return redirect("login")  
 
 # 条件を満たしていれば、ビデオチャットを始める
 # 条件 : urlに含まれるclass_idの授業が授業時間内であり、リクエスト元のユーザーがその授業の生徒または講師
@@ -277,6 +343,10 @@ def reserve_view(request):
         for reserved_class in reserved_class_set:
 
             if reserved_class.datetime.day == now_date.day and reserved_class.datetime.hour >= now_date.hour:
+
+                if reserved_class.datetime.hour == now_date.hour and now_date.minute >= 50:
+                    continue
+
                 todays_reserved_class_list.append(reserved_class)
             
         todays_reserved_class_list.sort(key=lambda x:x.datetime.timestamp())
@@ -343,7 +413,15 @@ def choose_reserved_class_datetime_view(request, teacher_id):
             else:
                 error = ""
 
-            return render(request, "choose_reserved_class_datetime.html", {"weekly_teachers_class_list" : weekly_teachers_class_list, "student" : student, "error" : error})
+            now_date = datetime.datetime.now(datetime.timezone.utc)
+            elapsed_time = relativedelta(now_date, teacher.user.start_datetime)
+
+            if elapsed_time.year is not None:
+                elapsed_year = f"{elapsed_time.year}年"
+            else:
+                elapsed_year = "1年未満"
+
+            return render(request, "choose_reserved_class_datetime.html", {"weekly_teachers_class_list" : weekly_teachers_class_list, "student" : student, "teacher" : teacher.user, "elapsed_year" : elapsed_year, "error" : error})
 
         elif request.method == "POST":
             user = request.user 
@@ -451,6 +529,9 @@ def manage_schedule_view(request):
                 # StudentModelのid=1の生徒はダミー
                 if teachers_class.datetime.day == now_date.day and teachers_class.datetime.hour >= now_date.hour and teachers_class.student.id != 1:
 
+                    if teachers_class.datetime.hour == now_date.hour and now_date.minute >= 50:
+                        continue
+
                     todays_teachers_class_list.append(teachers_class)
             
             # --------スケジュール用リストの作成--------
@@ -504,7 +585,7 @@ def manage_schedule_view(request):
 
     # ユーザーが生徒の場合
     elif request.user.user_type == "student":
-            return redirect("reserve")
+        return redirect("reserve")
     
     # ログインしていない場合
     else:

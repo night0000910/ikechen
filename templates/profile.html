@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="container">
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+        <h2 class="border-bottom pb-2 mb-0">{{referred_user.last_name}} {{referred_user.first_name}}</h2>
+        <img src={{referred_user.profile_image.url}} width="300" height="300">
+
+        {% if referred_user.rank == "bronze" %}
+        <p class="lead">ランク : <span style="color: #BC9E69;">ブロンズ</span></p>
+        {% elif referred_user.rank == "silver" %}
+        <p class="lead">ランク : <span style="color: #BEC1C3;">シルバー</span></p>
+        {% elif referred_user.rank == "gold" %}
+        <p class="lead">ランク : <span style="color: #EFC986;">ゴールド</span></p>
+        {% elif referred_user.rank == "diamond" %}
+        <p class="lead"><span style="color: #94D1C8;">ダイヤモンド</span></p>
+        {% endif %}
+
+        {% if referred_user.id == user.id %}
+            {% if user.user_type == "student" %}
+            <p class="lead">総学習時間 : {{user.spent_time}}分</p>
+            {% elif user.user_type == "teacher" %}
+            <p class="lead">総授業時間 : {{user.spent_time}}分</p>
+            {% endif %}
+        <p class="lead">開始日 : {{user.start_datetime|date:"Y年m月d日"}}</p>
+
+        {% else %}
+            {% if referred_user.user_type == "teacher" %}
+            <p class="lead">経歴 : {{elapsed_year}}</p>
+            {% endif %}
+        {% endif %}
+
+        {% if referred_user.id != user.id %}
+        <p class="lead">{{referred_user.self_introduction}}</p>
+        {% endif %}
+        
+    </div>
+</main>
+{% endblock content %}

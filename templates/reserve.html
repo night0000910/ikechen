@@ -2,17 +2,41 @@
 
 {% block content %}
 <main class="container">
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+        <div class="d-flex flex-row bd-highlight mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="lead">ランク</p>
+                    {% if user.rank == "bronze" %}
+                    <p class="h1" style="color: #BC9E69;">ブロンズ</p>
+                    {% elif user.rank == "silver" %}
+                    <p class="h1" style="color: #BEC1C3;">シルバー</p>
+                    {% elif user.rank == "gold" %}
+                    <p class="h1" style="color: #EFC986;">ゴールド</p>
+                    {% elif user.rank == "diamond" %}
+                    <p class="h1" style="color: #94D1C8;">ダイヤモンド</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                  <p class="lead">総学習時間</p>
+                  <p class="h1">{{user.spent_time}}分</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="my-3 p-3 bg-white rounded shadow-sm">
         
-        <h6 class="border-bottom pb-2 mb-0">今日の授業</h6>
+        <h5 class="border-bottom pb-2 mb-0">今日の授業</h5>
 
         <!-- 今日受ける授業を表示する -->
         {% for reserved_class in todays_reserved_class_list %}
         <div class="d-flex text-muted pt-3">
-            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="0" height="0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><img src="{{reserved_class.teacher.user.profile_image.url}}" width="38" height="38"></svg>
+            <a href="{% url 'profile' reserved_class.teacher.user.id %}"><svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="0" height="0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><img src="{{reserved_class.teacher.user.profile_image.url}}" width="38" height="38"></svg></a>
             <p class="pb-3 mb-0 small lh-sm border-bottom">
-              <strong class="d-block text-gray-dark">{{reserved_class.teacher.user.first_name}} {{reserved_class.teacher.user.last_name}}</strong>
+              <a href="{% url 'profile' reserved_class.teacher.user.id %}"><strong class="d-block text-gray-dark">{{reserved_class.teacher.user.last_name}} {{reserved_class.teacher.user.first_name}}</strong></a>
               <br>
               <br>
               時間 : {{reserved_class.datetime|date:"H時00分〜"}}
@@ -30,14 +54,14 @@
 
     <div class="my-3 p-3 bg-white rounded shadow-sm">
 
-        <h6 class="border-bottom pb-2 mb-0">予約したい講師を選択してください</h6>
+        <h5 class="border-bottom pb-2 mb-0">予約したい講師を選択してください</h5>
 
         <!-- 1週間以内に予約可能な講師を表示する -->
         {% for teacher in teacher_list %}
         <div class="d-flex text-muted pt-3">
             <a href="{% url 'choose_reserved_class_datetime' teacher.user.id %}"><svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="0" height="0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><img src="{{teacher.user.profile_image.url}}" width="38" height="38"></svg></a>
             <p class="pb-3 mb-0 small lh-sm border-bottom">
-              <a href="{% url 'choose_reserved_class_datetime' teacher.user.id %}"><strong class="d-block text-gray-dark">{{teacher.user.first_name}} {{teacher.user.last_name}}</strong></a>
+              <a href="{% url 'choose_reserved_class_datetime' teacher.user.id %}"><strong class="d-block text-gray-dark">{{teacher.user.last_name}} {{teacher.user.first_name}}</strong></a>
             </p>
         </div>
         {% endfor %}

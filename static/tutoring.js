@@ -4,6 +4,9 @@ var usernameElement = document.getElementById("username");
 var username = usernameElement.value;
 console.log("ユーザー名 : ", username);
 
+var userIdElement = document.getElementById("user-id");
+var userId = userIdElement.value;
+
 var webSocket;
 
 var loc = window.location;
@@ -13,7 +16,7 @@ if(loc.protocol == "https:"){
     wsStart = "wss://";
 }
 
-var endPoint = wsStart + loc.host + loc.pathname;
+var endPoint = wsStart + loc.host + loc.pathname + userId + "/";
 
 console.log("遷移先のURL : ", endPoint);
 
@@ -144,6 +147,7 @@ function sendMsgOnClick(){
     var message = messageInput.value;
 
     var li = document.createElement("li");
+    li.style.listStyleType = "none";
     li.appendChild(document.createTextNode(username + ": " + message));
     messageList.appendChild(li);
 
@@ -296,6 +300,7 @@ function dcOnMessage(event){
     var message = event.data;
 
     var li = document.createElement("li");
+    li.style.listStyleType = "none";
     li.appendChild(document.createTextNode(message));
     messageList.appendChild(li);
 }
@@ -308,6 +313,10 @@ function createVideo(peerUsername){
     remoteVideo.id = peerUsername + "-video";
     remoteVideo.autoplay = true;
     remoteVideo.playsInline = true;
+    remoteVideo.width = 800;
+    remoteVideo.height = 600;
+    remoteVideo.style.gridTemplateColumns = 2;
+    remoteVideo.style.gridTemplateRows = 1;
 
     var videoWrapper = document.createElement("div");
 

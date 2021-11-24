@@ -1,12 +1,17 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.contrib.auth import get_user_model
 
 import json
+import datetime
+import math
+import asyncio
+
+from . import models
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
-        # クラスidに変更する
         class_id = self.scope["url_route"]["kwargs"]["class_id"]
         self.room_group_name = class_id
 
@@ -16,6 +21,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+
+        # 授業開始時刻をデータベースに記録する
+        now_date = await asyncio.get_event_loop(None, datetime.datetime.utcnow)
+        print(now_date)
+        user_id = self.scope["url_route"]["kwargs"]["user_id"]
+        user = get_user_model().objects.get(id=user_id)
+        user.class_start_datetime = now_date
+        user.save()
     
     async def disconnect(self, close_code):
 
@@ -25,6 +38,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         print("通信が切断されました")
+
+        # 授業開始時刻、授業時間をデータベースに記録する
+        now_date = datetime.datetime.utcnow()
+        user_id = self.scope["url_route"]["kwargs"]["user_id"]
+        user = get_user_model().objects.get(id=user_id)
+        user.class_ending_datetime = now_date
+        time_interval = user.class_ending_datetime - user.class_start_datetime
+        user.spent_time += math.floor(time_interval.seconds/60)
+        user.save()
 
     async def receive(self, text_data):
 

@@ -1,0 +1,14 @@
+#video-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto;
+}
+
+#local-video {
+    grid-template-columns: 1;
+    grid-template-rows: 1;
+}
+
+#message-list {
+    list-style-type: none;
+}

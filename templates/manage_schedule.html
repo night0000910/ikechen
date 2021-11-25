@@ -67,7 +67,11 @@
 
                 <!-- ループ回数が偶数回目の時だけ日付を表示する -->
                 {% if forloop.counter0|divisibleby:"2" %}
-                <p class="lead">{{halfday_time_list.0|date:"m月d日"}}</p>
+                    {% if halfday_time_list.0.datetime %}
+                    <p class="lead">{{halfday_time_list.0.datetime|date:"m月d日"}}</p>
+                    {% else %}
+                    <p class="lead">{{halfday_time_list.0|date:"m月d日"}}</p>
+                    {% endif %}
                 {% endif %}
 
             <div class="d-flex justify-content-left">

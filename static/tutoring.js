@@ -271,20 +271,20 @@ function createAnswerer(offer, peerUsername, receiver_channel_name){
     peer.createOffer()
         .then(o => peer.setLocalDescription(o))
         .then(() => {
-            console.log("Local descriptionのセットが完了しました");
+            console.log("Local descriptionのセットが完了しました")
         });
 
     peer.setRemoteDescription(offer)
-        .then(() => {
-            console.log("Remote descriptionのセットが完了しました。 ユーザー : %s", peerUsername);
+    .then(() => {
+        console.log("Remote descriptionのセットが完了しました。 ユーザー : %s", peerUsername);
 
-            peer.createAnswer();
-        })
-        .then(a => {
-            console.log("アンサーが作成されました")
+        peer.createAnswer();
+    })
+    .then(a => {
+        console.log("アンサーが作成されました")
 
-            peer.setLocalDescription(a);
-        })
+        peer.setLocalDescription(a);
+    })
 
 }
 

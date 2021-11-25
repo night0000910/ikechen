@@ -461,7 +461,7 @@ def signup_studentaccount_view(request):
             user = get_user_model().objects.create_user(username, "", password)
             user.first_name = first_name
             user.last_name = last_name
-            user.type = type
+            user.user_type = type
             user.save()
 
             models.StudentModel.objects.create(user=user)
@@ -611,7 +611,7 @@ def signup_teacheraccount_view(request):
             user = get_user_model().objects.create_user(username, "", password)
             user.first_name = first_name
             user.last_name = last_name
-            user.type = type
+            user.user_type = type
             user.save()
 
             models.TeacherModel.objects.create(user=user)

@@ -33,8 +33,19 @@
             {% for halfday_teachers_class_list in weekly_teachers_class_list %}
 
             <!-- ループ回数が偶数回目の時だけ日付を表示する -->
+            <!-- 偶数番目のリストの要素数が0であれば、次のリストを使って日付を表示する -->
             {% if forloop.counter0|divisibleby:"2" %}
-            <p class="lead">{{halfday_teachers_class_list.0.datetime|date:"m月d日"}}</p>
+                {% if halfday_teachers_class_list %}
+                <p class="lead">{{halfday_teachers_class_list.0.datetime|date:"m月d日"}}</p>
+                {% else %}
+                    {% with next_index=forloop.counter %}
+                    {% for halfday_teachers_class_list in weekly_teachers_class_list %}
+                        {% if next_index == forloop.counter0 %}
+                        <p class="lead">{{halfday_teachers_class_list.0.datetime|date:"m月d日"}}</p>
+                        {% endif %}
+                    {% endfor %}
+                    {% endwith %}
+                {% endif %}
             {% endif %}
 
             <div class="d-flex justify-content-left">

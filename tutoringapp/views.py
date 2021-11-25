@@ -77,8 +77,76 @@ def return_datetime_duplicate_class(class_list, year, month, day, hour):
     
     return duplicate_class
 
+# 引数に渡された時刻が、昨日の15時0分(JSTにおける、今日の0時0分)から一日以内の時刻かどうかを判定する
+def judge_datetime_is_within_today(this_datetime):
+    jst_today = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    today = timezone.now().replace(day=jst_today.day-1, hour=15, minute=0, second=0, microsecond=0) # UTCにおける15時0分(JSTにおける0時0分)
+    one_days_after = today + datetime.timedelta(days=1)
+
+    if today <= this_datetime < one_days_after:
+        return True
+    else:
+        return False
+
+# 引数に渡された時刻が、現在時刻より前の時刻かどうかを判定する
+def judge_datetime_is_before_now(this_datetime):
+    now = timezone.now().replace(minute=0, second=0, microsecond=0)
+
+    if this_datetime >= now:
+        return True
+    else:
+        return False
+
+# 今日の、講師が行う予定の授業のリストを作成する
+# teacher_id : 講師のUserModelにおけるid
+def create_todays_teachers_class_list(teacher_id):
+    teacher = models.TeacherModel.objects.get(user=teacher_id)
+    teachers_class_set = models.ClassModel.objects.filter(teacher=teacher.id)
+    teachers_class_list = change_set_to_list(teachers_class_set)
+    todays_teachers_class_list = []
+    now = timezone.now()
+
+    # 今日行う授業をリストに入れる
+    for teachers_class in teachers_class_list:
+
+        # StudentModelのid=1の生徒はダミー
+        if judge_datetime_is_within_today(teachers_class.datetime) and judge_datetime_is_before_now(teachers_class.datetime) and teachers_class.student.id != 1:
+
+            if teachers_class.datetime.hour == now.hour and now.minute >= 50:
+                continue
+
+            todays_teachers_class_list.append(teachers_class)
+    
+    todays_teachers_class_list.sort(key=lambda x:x.datetime.timestamp())
+    
+    return todays_teachers_class_list
+
+# 生徒が予約した授業のうち、今日行われる授業のリストを作成する
+# student_id : 生徒のUserModelにおけるid
+def create_todays_reserved_class_list(student_id):
+    student = models.StudentModel.objects.get(user=student_id)
+    reserved_class_set = models.ClassModel.objects.filter(student=student.id)
+    reserved_class_list = change_set_to_list(reserved_class_set)
+    todays_reserved_class_list = []
+    now = timezone.now()
+
+    # 今日行う授業をリストに入れる
+    for reserved_class in reserved_class_list:
+
+        # StudentModelのid=1の生徒はダミー
+        if judge_datetime_is_within_today(reserved_class.datetime) and judge_datetime_is_before_now(reserved_class.datetime):
+
+            if reserved_class.datetime.hour == now.hour and now.minute >= 50:
+                continue
+
+            todays_reserved_class_list.append(reserved_class)
+    
+        todays_reserved_class_list.sort(key=lambda x:x.datetime.timestamp())
+    
+    return todays_reserved_class_list
+
 # 一週間分の日付と時刻のリストを作成する
-# teacher_id : 講師のUserModelのid
+# teacher_id : 講師のUserModelにおけるid
 def create_weekly_datetime_list(teacher_id):
     teacher = models.TeacherModel.objects.get(user=teacher_id)
     teachers_class_set = models.ClassModel.objects.filter(teacher=teacher.id)
@@ -137,13 +205,33 @@ def create_weekly_datetime_list(teacher_id):
 
     return weekly_datetime_list
 
-# student_id : 生徒のUserModelのid teacher_id : 講師のUserModelのid
+# 引数に渡された時刻が、昨日の15時0分(JSTにおける、今日の0時0分)から一週間以内の時刻かどうかを判定する
+def judge_datetime_is_within_oneweek(this_datetime):
+    jst_today = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    today = timezone.now().replace(day=jst_today.day-1, hour=15, minute=0, second=0, microsecond=0) # UTCにおける15時0分(JSTにおける0時0分)
+    seven_days_after = today + datetime.timedelta(days=7)
+
+    if today <= this_datetime < seven_days_after:
+        return True
+    else:
+        return False
+
+# 引数に渡された時刻が、現在時刻の1時間後より前の時刻かどうかを判定する
+def judge_datetime_is_before_one_hour(this_datetime):
+    one_hour_later = timezone.now().replace(minute=30, second=0, microsecond=0) + datetime.timedelta(hours=1)
+
+    if this_datetime < one_hour_later:
+        return True
+    else:
+        return False
+
+# ある講師の、一週間分の授業のリストを作成する
+# student_id : 生徒のUserModelにおけるid teacher_id : 講師のUserModelにおけるid
 def create_weekly_teachers_class_list(student_id, teacher_id):
     student = models.StudentModel.objects.get(user=student_id)
     teacher = models.TeacherModel.objects.get(user=teacher_id)
     teachers_class_set = models.ClassModel.objects.filter(teacher=teacher.id)
-    teacher_class_list = change_set_to_list(teachers_class_set)
-    weekly_teachers_class_list = [] 
+    teachers_class_list = [] 
     now = timezone.now()
 
     # 今日から1週間以内のまだ予約されていない授業、または自分が予約した授業をリストに入れる
@@ -152,65 +240,59 @@ def create_weekly_teachers_class_list(student_id, teacher_id):
         # StudentModelのid=1の生徒はダミー
         if judge_datetime_is_within_oneweek(teachers_class.datetime) and (teachers_class.student.id == 1 or teachers_class.student.id == student.id):
 
-            weekly_teachers_class_list.append(teachers_class)
-    
-    # ↑までは修正済。↓からはまだ修正していない。
+            # 現在時刻の1時間後より前の時刻の授業は除外する
+            if judge_datetime_is_before_one_hour(teachers_class.datetime):
+                continue
 
-    weekly_teachers_class_list.sort(key=lambda x:x.datetime.timestamp())
-    new_weekly_teachers_class_list = []
+            teachers_class_list.append(teachers_class)
+
+    teachers_class_list.sort(key=lambda x:x.datetime.timestamp())
+    jst_today = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    today = timezone.now().replace(day=jst_today.day-1, hour=15, minute=0, second=0, microsecond=0) # UTCにおける15時0分(JSTにおける0時0分)
+    weekly_teachers_class_list = []
     halfday_teachers_class_list = [] 
-    today = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) # 今日の0時0分
     zero_oclock = 0
     three_oclock = 3
     fifteen_oclock = 15
     twenty_four_oclock = 24
+    zero_days_after = 0
+    seven_days_after = 7
 
     # 半日分の授業を束ねたリストを作成し、一週間分の授業リストに入れる。これを繰り返す。
-    for i in range(today.day, today.day+7):
+    for i in range(zero_days_after, seven_days_after):
 
         # 半日分の授業のリストを作成
         for j in range(fifteen_oclock, twenty_four_oclock):
+            this_datetime = today.replace(hour=j) + datetime.timedelta(days=i)
+            duplicate_class = return_datetime_duplicate_class(teachers_class_list, this_datetime.year, this_datetime.month, this_datetime.day, this_datetime.hour)
 
-            for teachers_class in weekly_teachers_class_list:
-                
-                if teachers_class.datetime.day == i and teachers_class.datetime.hour == j:
-
-                    halfday_teachers_class_list.append(teachers_class)
+            if duplicate_class:
+                halfday_teachers_class_list.append(duplicate_class)
             
         for j in range(zero_oclock, three_oclock):
+            this_datetime = today.replace(hour=j) + datetime.timedelta(days=i+1)
+            duplicate_class = return_datetime_duplicate_class(teachers_class_list, this_datetime.year, this_datetime.month, this_datetime.day, this_datetime.hour)
 
-            for teachers_class in weekly_teachers_class_list:
-                
-                if teachers_class.datetime.day == i and teachers_class.datetime.hour == j:
+            if duplicate_class:
+                halfday_teachers_class_list.append(duplicate_class)
 
-                    halfday_teachers_class_list.append(teachers_class)
         
-        new_weekly_teachers_class_list.append(halfday_teachers_class_list)
+        weekly_teachers_class_list.append(halfday_teachers_class_list)
         halfday_teachers_class_list = []
 
         # 半日分の授業のリストを作成
         for j in range(three_oclock, fifteen_oclock):
+            this_datetime = today.replace(hour=j) + datetime.timedelta(days=i+1)
+            duplicate_class = return_datetime_duplicate_class(teachers_class_list, this_datetime.year, this_datetime.month, this_datetime.day, this_datetime.hour)
 
-            for teachers_class in weekly_teachers_class_list:
-
-                if teachers_class.datetime.day == i and teachers_class.datetime.hour == j:
-
-                    halfday_teachers_class_list.append(teachers_class)
+            if duplicate_class:
+                halfday_teachers_class_list.append(duplicate_class)
         
-        new_weekly_teachers_class_list.append(halfday_teachers_class_list)
+        weekly_teachers_class_list.append(halfday_teachers_class_list)
         halfday_teachers_class_list = []
     
-    return new_weekly_teachers_class_list
+    return weekly_teachers_class_list
 
-# 引数に渡された時刻が、今日から一週間以内の時刻かどうかを判定する
-def judge_datetime_is_within_oneweek(datetime):
-    now = timezone.now()
-    time_interval = datetime - now
-
-    if time_interval.days < 7:
-        return True
-    else:
-        return False
 
 # -------------------------講師・生徒共通のページ-------------------------
 
@@ -395,30 +477,17 @@ def signup_studentaccount_view(request):
 
 # 予約した授業を表示
 # どの先生の授業を予約するかを決める
+# *** まだ修正していない ***
 def reserve_view(request):
 
     # 生徒の場合
     if request.user.is_authenticated and request.user.user_type == "student":
 
-        # --------予約した授業の表示--------
         user = request.user
         student = models.StudentModel.objects.get(user=user.id)
         now = timezone.now() 
-        reserved_class_set = models.ClassModel.objects.filter(student=student.id)
-        reserved_class_list = change_set_to_list(reserved_class_set)
-        todays_reserved_class_list = [] 
 
-        # 予約した授業のうち、今日受ける授業をリストに入れる
-        for reserved_class in reserved_class_set:
-
-            if reserved_class.datetime.year == now.year and reserved_class.datetime.month == now and reserved_class.datetime.day == now.day and reserved_class.datetime.hour >= now.hour:
-
-                if reserved_class.datetime.hour == now.hour and now.minute >= 50:
-                    continue
-
-                todays_reserved_class_list.append(reserved_class)
-            
-        todays_reserved_class_list.sort(key=lambda x:x.datetime.timestamp())
+        todays_reserved_class_list = create_todays_reserved_class_list(user.id) # 今日行われる授業のリストを作成する
 
         # --------予約可能な講師の表示--------
         teacher_set = models.TeacherModel.objects.all()
@@ -428,11 +497,10 @@ def reserve_view(request):
         for teacher in teacher_set:
             teachers_class_set = models.ClassModel.objects.filter(teacher=teacher.id) 
             teachers_class_list = change_set_to_list(teachers_class_set) 
-            now_date = datetime.datetime.now()
 
             for teachers_class in teachers_class_list:
 
-                if now_date.day <= teachers_class.datetime.day <= now_date.day+6:
+                if now.day <= teachers_class.datetime.day <= now.day+6:
                     teacher_list.append(teacher)
                     break
 
@@ -456,17 +524,18 @@ def choose_reserved_class_datetime_view(request, teacher_id):
 
         if request.method == "GET":
             user = request.user
+            student = models.StudentModel.objects.get(user=user.id)
             teacher = models.TeacherModel.objects.get(user=teacher_id)
 
-            weekly_teachers_class_list = create_weekly_teachers_class_list(user.id, teacher_id)
+            weekly_teachers_class_list = create_weekly_teachers_class_list(user.id, teacher_id) # 選択した講師の、一週間分の授業のリストを作成する
 
             if request.GET.get("error"):
                 error = request.GET.get("error")
             else:
                 error = ""
 
-            now_date = datetime.datetime.now(datetime.timezone.utc)
-            elapsed_time = relativedelta(now_date, teacher.user.start_datetime)
+            now = timezone.now()
+            elapsed_time = relativedelta(now, teacher.user.start_datetime)
 
             if elapsed_time.year is not None:
                 elapsed_year = f"{elapsed_time.year}年"
@@ -569,28 +638,15 @@ def manage_schedule_view(request):
             user = request.user
             teacher = models.TeacherModel.objects.get(user=user.id)
             weekly_datetime_list = create_weekly_datetime_list(user.id) # 一週間分の日付、時刻のリストを作成(UTCに準拠)
-            teachers_class_set = models.ClassModel.objects.filter(teacher=teacher.id)
-            teachers_class_list = change_set_to_list(teachers_class_set)
-            todays_teachers_class_list = [] 
+            todays_teachers_class_list = create_todays_teachers_class_list(user.id) # 今日行われる授業のリストを作成する
             now = timezone.now()
-
-            # 今日行う授業をリストに入れる
-            for teachers_class in teachers_class_list:
-
-                # StudentModelのid=1の生徒はダミー
-                if teachers_class.datetime.year == now.year and teachers_class.datetime.month == now.month and teachers_class.datetime.day == now.day and teachers_class.datetime.hour >= now.hour and teachers_class.student.id != 1:
-
-                    if teachers_class.datetime.hour == now.hour and now.minute >= 50:
-                        continue
-
-                    todays_teachers_class_list.append(teachers_class)
                 
             if request.GET.get("error"):
                 error = request.GET.get("error")
             else:
                 error = ""
 
-            return render(request, "manage_schedule.html", {"weekly_datetime_list" : weekly_datetime_list, "todays_teachers_class_list" : todays_teachers_class_list, "teachers_class_list" : teachers_class_list, "error" : error, "now" : now})
+            return render(request, "manage_schedule.html", {"weekly_datetime_list" : weekly_datetime_list, "todays_teachers_class_list" : todays_teachers_class_list, "error" : error, "now" : now})
 
         elif request.method == "POST":
 

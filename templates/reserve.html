@@ -43,7 +43,7 @@
               <br>
               <br>
               <!-- 現在時刻が授業の時間と一致していれば、「授業を開始する」ボタンを表示する -->
-              {% if reserved_class.datetime.hour == now_date.hour and now_date.minute < 50 %}
+              {% if reserved_class.datetime.hour == now.hour and now.minute < 50 %}
               <a href="{% url 'tutoring' reserved_class.id %}" class="btn btn-outline-warning">授業を開始する</a>
               {% endif %}
             </p>

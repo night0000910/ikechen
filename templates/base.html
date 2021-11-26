@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -7,6 +8,7 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link href="{% static 'remove_underline.css' %}" rel="stylesheet">
 
     <title>個別指導Online</title>
 
@@ -26,6 +28,9 @@
           <a class="p-2 text-dark" href="{% url 'setup_account' %}">アカウント設定</a>
           <a class="p-2 text-dark" href="{% url 'logout' %}">ログアウト</a>
           {% else %}
+            {% if request.path != "/home_page/" %}
+            <a class="p-2 text-dark" href="{% url 'home_page' %}">ホーム</a>
+            {% endif %}
           <a class="p-2 text-dark" href="{% url 'login' %}">ログイン</a>
           {% endif %}
 

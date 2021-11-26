@@ -299,7 +299,19 @@ def create_weekly_teachers_class_list(student_id, teacher_id):
 
 # ホームページ
 def home_page_view(request):
-    pass
+    
+    if request.user.is_authenticated:
+        user = request.user
+
+        if user.user_type == "student":
+            return redirect("reserve")
+
+        elif user.user_type == "teacher":
+            return redirect("manage_schedule")
+
+    else:
+        
+        return render(request, "home_page.html")
 
 # ログインページ
 def login_view(request):
@@ -337,7 +349,7 @@ def login_view(request):
 # ログアウトページ
 def logout_view(request):
     logout(request)
-    return redirect("login")
+    return redirect("home_page")
 
 # ユーザーのプロフィールを表示する
 def profile_view(request, user_id):

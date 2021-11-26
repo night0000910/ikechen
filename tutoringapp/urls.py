@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path("home_page/", views.home_page_view, name="home_page"), # ホームページ
     path("login/", views.login_view, name="login"), # ログインページ
     path("logout/", views.logout_view, name="logout"), # ログアウトページ
     path("profile/<int:user_id>/", views.profile_view, name="profile"), # ユーザーのプロフィールを表示するページ

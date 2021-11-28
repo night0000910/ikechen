@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import django_heroku
+
 from pathlib import Path
 import os
 
@@ -140,3 +142,5 @@ CHANNEL_LAYERS = {
         "BACKEND" : "channels.layers.InMemoryChannelLayer"
     }
 }
+
+django_heroku.settings(locals())

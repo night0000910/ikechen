@@ -12,6 +12,8 @@ urlpatterns = [
     path("signup_studentaccount/", views.signup_studentaccount_view, name="signup_studentaccount"), # 生徒アカウントを作成するページ
     path("reserve/", views.reserve_view, name="reserve"), # どの先生を予約するかを決めるページ
     path("choose_learning_datetime/<int:teacher_id>/", views.choose_reserved_class_datetime_view, name="choose_reserved_class_datetime"), # 授業の時間を選択するページ。teacher_idには予約する先生のユーザーidが入る。
+    path("add_reserved_class/<int:teacher_id>/<int:class_id>/", views.add_reserved_class_view, name="add_reserved_class"), # 授業を予約するページ
     path("signup_teacheraccount/", views.signup_teacheraccount_view, name="signup_teacheraccount"), # 講師アカウントを作成するページ
     path("manage_schedule/", views.manage_schedule_view, name="manage_schedule"), # 講師のスケジュールを管理するページ
+    path("add_teachers_class/<str:teachers_class_datetime_text>/", views.add_teachers_class_view, name="add_teachers_class"), # スケジュールを更新するページ
 ]

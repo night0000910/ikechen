@@ -23,6 +23,12 @@ def add_getparam_to_url(reverse_url, get_params):
 
     return url
 
+# "true", "false"といった文字列をbool値へ変換する
+def change_str_to_bool(str):
+    if str == "true":
+        return True
+    elif str == "false":
+        return False
 
 # 行のセットをリストに変換する
 def change_set_to_list(record_set):
@@ -80,7 +86,7 @@ def return_datetime_duplicate_class(class_list, year, month, day, hour):
 # 引数に渡された時刻が、昨日の15時0分(JSTにおける、今日の0時0分)から一日以内の時刻かどうかを判定する
 def judge_datetime_is_within_today(this_datetime):
     jst_today = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-    today = timezone.now().replace(day=jst_today.day-1, hour=15, minute=0, second=0, microsecond=0) # UTCにおける15時0分(JSTにおける0時0分)
+    today = timezone.now().replace(day=jst_today.day, hour=15, minute=0, second=0, microsecond=0) - datetime.timedelta(days=1) # UTCにおける15時0分(JSTにおける0時0分)
     one_days_after = today + datetime.timedelta(days=1)
 
     if today <= this_datetime < one_days_after:
@@ -154,7 +160,7 @@ def create_weekly_datetime_list(teacher_id):
     weekly_datetime_list = [] 
     halfday_time_list = [] # 半日分の時刻のリスト
     jst_today = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-    today = timezone.now().replace(day=jst_today.day-1, hour=15, minute=0, second=0, microsecond=0) # UTCにおける15時0分(JSTにおける0時0分)
+    today = timezone.now().replace(day=jst_today.day, hour=15, minute=0, second=0, microsecond=0) - datetime.timedelta(days=1) # UTCにおける15時0分(JSTにおける0時0分)
     zero_oclock = 0
     three_oclock = 3
     fifteen_oclock = 15
@@ -208,7 +214,7 @@ def create_weekly_datetime_list(teacher_id):
 # 引数に渡された時刻が、昨日の15時0分(JSTにおける、今日の0時0分)から一週間以内の時刻かどうかを判定する
 def judge_datetime_is_within_oneweek(this_datetime):
     jst_today = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-    today = timezone.now().replace(day=jst_today.day-1, hour=15, minute=0, second=0, microsecond=0) # UTCにおける15時0分(JSTにおける0時0分)
+    today = timezone.now().replace(day=jst_today.day, hour=15, minute=0, second=0, microsecond=0) - datetime.timedelta(days=1) # UTCにおける15時0分(JSTにおける0時0分)
     seven_days_after = today + datetime.timedelta(days=7)
 
     if today <= this_datetime < seven_days_after:
@@ -232,7 +238,6 @@ def create_weekly_teachers_class_list(student_id, teacher_id):
     teacher = models.TeacherModel.objects.get(user=teacher_id)
     teachers_class_set = models.ClassModel.objects.filter(teacher=teacher.id)
     teachers_class_list = [] 
-    now = timezone.now()
 
     # 今日から1週間以内のまだ予約されていない授業、または自分が予約した授業をリストに入れる
     for teachers_class in teachers_class_set:
@@ -248,7 +253,7 @@ def create_weekly_teachers_class_list(student_id, teacher_id):
 
     teachers_class_list.sort(key=lambda x:x.datetime.timestamp())
     jst_today = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-    today = timezone.now().replace(day=jst_today.day-1, hour=15, minute=0, second=0, microsecond=0) # UTCにおける15時0分(JSTにおける0時0分)
+    today = timezone.now().replace(day=jst_today.day, hour=15, minute=0, second=0, microsecond=0) - datetime.timedelta(days=1) # UTCにおける15時0分(JSTにおける0時0分)
     weekly_teachers_class_list = []
     halfday_teachers_class_list = [] 
     zero_oclock = 0
@@ -569,11 +574,8 @@ def choose_reserved_class_datetime_view(request, teacher_id):
             # まだ授業を予約していなければ、ClassModelに生徒を登録する
             if not duplicate:
 
-                learning_class = models.ClassModel.objects.filter(teacher=teacher.id).get(datetime=reserved_class_datetime) # 予約する授業
-                learning_class.student = student
-                learning_class.save()
-
-                return redirect("choose_reserved_class_datetime", teacher_id=teacher_id)
+                reserved_class = models.ClassModel.objects.filter(teacher=teacher.id).get(datetime=reserved_class_datetime) # 予約する授業
+                return redirect("add_reserved_class", teacher_id=teacher_id, class_id=reserved_class.id)
             
             # 既に授業を予約していれば、登録しない。
             else:
@@ -590,6 +592,29 @@ def choose_reserved_class_datetime_view(request, teacher_id):
     else:
         return redirect("login")
 
+# teacher_id : 講師のUserModelのid, class_id : 予約する授業のClassModelのid
+def add_reserved_class_view(request, teacher_id, class_id):
+
+    if request.user.is_authenticated:
+
+        if request.method == "GET":
+            reserved_class = models.ClassModel.objects.get(id=class_id)
+            return render(request, "add_reserved_class.html", {"reserved_class" : reserved_class})
+
+        elif request.method == "POST":
+            user = request.user
+            student = models.StudentModel.objects.get(user=user.id)
+            add = change_str_to_bool(request.POST["add"])
+
+            if add:
+                reserved_class = models.ClassModel.objects.get(id=class_id)
+                reserved_class.student = student
+                reserved_class.save()
+            
+            return redirect("choose_reserved_class_datetime", teacher_id=teacher_id)
+
+    else:
+        return redirect("home_page")
 
 
 # ---------------------------講師専用のページ----------------------------
@@ -672,14 +697,12 @@ def manage_schedule_view(request):
             teachers_class_datetime = datetime.datetime.strptime(teachers_class_datetime_text, "%Y:%m:%d %H:00") 
 
             # 個別指導できる日付、時刻が既に登録したものと重複していないかを調べる
-            duplicate = is_duplicate(models.ClassModel.objects.filter(datetime=teachers_class_datetime))
+            duplicate = is_duplicate(models.ClassModel.objects.filter(teacher=teacher.id).filter(datetime=teachers_class_datetime))
 
             # 日付、時刻が重複していなければ、ClassModelに登録
             if not duplicate:
 
-                models.ClassModel.objects.create(student=dummy_student, teacher=teacher, datetime=teachers_class_datetime)
-
-                return redirect("manage_schedule")
+                return redirect("add_teachers_class", teachers_class_datetime_text=teachers_class_datetime_text)
             
             # 日付、時刻が重複していれば、登録しない。
             else:
@@ -695,3 +718,28 @@ def manage_schedule_view(request):
     # ログインしていない場合
     else:
         return redirect("login")
+
+# スケジュールを更新する
+# teachers_class_datetime_text : 追加する授業の時刻を表現したテキスト
+def add_teachers_class_view(request, teachers_class_datetime_text):
+
+    if request.user.is_authenticated:
+
+        if request.method == "GET":
+            teachers_class_datetime = datetime.datetime.strptime(teachers_class_datetime_text, "%Y:%m:%d %H:00") 
+            return render(request, "add_teachers_class.html", {"teachers_class_datetime" : teachers_class_datetime})
+
+        elif request.method == "POST":
+            user = request.user
+            teacher = models.TeacherModel.objects.get(user=user.id) 
+            add = change_str_to_bool(request.POST["add"])
+            dummy_student = models.StudentModel.objects.get(id=1) 
+            teachers_class_datetime = datetime.datetime.strptime(teachers_class_datetime_text, "%Y:%m:%d %H:00") 
+
+            if add:
+                models.ClassModel.objects.create(student=dummy_student, teacher=teacher, datetime=teachers_class_datetime)
+            
+            return redirect("manage_schedule")            
+
+    else:
+        return redirect("home_page")

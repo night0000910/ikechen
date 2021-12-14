@@ -494,7 +494,6 @@ def signup_studentaccount_view(request):
 
 # 予約した授業を表示
 # どの先生の授業を予約するかを決める
-# *** まだ修正していない ***
 def reserve_view(request):
 
     # 生徒の場合

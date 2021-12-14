@@ -10,7 +10,7 @@ from urllib.parse import urlencode
 
 from . import models
 
-
+# views.py
 # *** views.pyで扱う時刻はUTCに統一する ***
 
 # --------------------------------関数-------------------------------

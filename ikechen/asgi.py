@@ -16,7 +16,7 @@ import os
 import tutoringapp.routing
 
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tutoring.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ikechen.settings')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),

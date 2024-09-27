@@ -1,0 +1,37 @@
+{% extends "studentapp/base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="columns is-multiline">
+
+            {% for mentor in mentors %}
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-image">
+                        <figure class="image is-4by1">
+                            <img src="{{ mentor.coordinate.image.url }}">
+                        </figure>
+                    </div>
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-content">
+                                <p class="title is-4">{{ mentor.username }}</p>
+                                <p class="subtitle is-6">{{ mentor.style.name }}</p>
+                                <span class="tag is-primary is-light">Primary</span>
+                                <span class="tag is-link is-light">Link</span>
+                                <span class="tag is-info is-light">Info</span>
+                                <span class="tag is-success is-light">Success</span>
+                                <span class="tag is-warning is-light">Warning</span>
+                                <span class="tag is-danger is-light">Danger</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+{% endblock content %}

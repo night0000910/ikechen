@@ -316,7 +316,7 @@ def home_page_view(request):
 
     else:
         
-        return render(request, "home_page.html")
+        return render(request, "studentapp/lp.html")
 
 # ログインページ
 def login_view(request):

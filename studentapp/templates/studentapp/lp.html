@@ -1,0 +1,19 @@
+{% extends "studentapp/navbar_lp.html" %}
+{% load static %}
+
+{% block header %}
+<link href="{% static 'studentapp/css/lp.css' %}" rel="stylesheet">
+{% endblock header %}
+
+{% block content %}
+<main class="container">
+    <video loop autoplay playsinline muted>
+        <source src="{% static 'studentapp/videos/ikechen_lp_video.mp4' %}" type="video/mp4">
+    </video>
+
+    <div class="content">
+        <div class="content-inner">変わろう<br>かっこいい自分へ。</div>
+    </div>
+
+</main>
+{% endblock content %}

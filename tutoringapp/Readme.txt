@@ -1,1 +1,0 @@
-StudentModelのid=1の列はダミー

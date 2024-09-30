@@ -1,0 +1,102 @@
+[
+    {
+        "model": "mentorapp.mentor",
+        "pk": 1,
+        "fields": {
+            "username": "しんじ",
+            "profile_image": "images/mentor_profiles/testdata/shinji.jpg",
+            "self_introduction": "こんにちは、しんじです。シンプルなデザインにこだわりつつも、他の人と差をつけるスタイルを提案しています。\n私のコーディネートは、普段使いしやすいアイテムを中心に、カジュアルでも洗練された印象を与えることを目指しています。\n気軽におしゃれを楽しみたい方、ぜひ一緒に新しいスタイルを見つけましょう。",
+            "style": [3, 4]
+        }
+    },
+    {
+        "model": "mentorapp.mentor",
+        "pk": 2,
+        "fields": {
+            "username": "たくみ",
+            "profile_image": "images/mentor_profiles/testdata/takumi.jpg",
+            "self_introduction": "たくみです。カジュアルな中にも清潔感を大切にしたコーディネートが得意です。\n毎日のおしゃれを簡単に楽しむ方法を提案します。\n普段使いできるアイテムを中心に、垢抜けたスタイルを見つけたい方はぜひご相談ください。",
+            "style": [2, 9]
+        }
+    },
+    {
+        "model": "mentorapp.mentor",
+        "pk": 3,
+        "fields": {
+            "username": "なおと",
+            "profile_image": "images/mentor_profiles/testdata/naoto.jpg",
+            "self_introduction": "はじめまして、なおとです。私はキレイめスタイルが得意で、シンプルでスタイリッシュなアイテムを組み合わせたコーディネートを提案します。\n日常的に使えるおしゃれなスタイルを追求したい方、ぜひ一緒にファッションを楽しみましょう。",
+            "style": [1, 7]
+        }
+    },
+    {
+        "model": "mentorapp.mentor",
+        "pk": 4,
+        "fields": {
+            "username": "あきら",
+            "profile_image": "images/mentor_profiles/testdata/akira.jpg",
+            "self_introduction": "こんにちは、あきらです。フォーマルなスタイルからカジュアルまで、幅広いコーディネートを提案します。\nビジネスシーンでも使える洗練されたファッションを追求している方にぴったりのアドバイスを提供します。",
+            "style": [6, 12]
+        }
+    },
+    {
+        "model": "mentorapp.mentor",
+        "pk": 5,
+        "fields": {
+            "username": "けんた",
+            "profile_image": "images/mentor_profiles/testdata/kenta.jpg",
+            "self_introduction": "けんたです。スポーティなスタイルが得意で、日常的に動きやすく、おしゃれさも兼ね備えたコーディネートを提案します。\nアウトドアやアクティブなライフスタイルに合うファッションを一緒に探しましょう。",
+            "style": [10, 15]
+        }
+    },
+    {
+        "model": "mentorapp.mentor",
+        "pk": 6,
+        "fields": {
+            "username": "りょう",
+            "profile_image": "images/mentor_profiles/testdata/ryo.jpg",
+            "self_introduction": "りょうです。私はカジュアルながらも清潔感のあるスタイルを得意としています。\nシンプルなアイテムをうまく組み合わせて、自然体でありながらも垢抜けた印象を与えるコーディネートを提案します。\n普段使いしやすく、魅力的なファッションを一緒に探していきましょう。",
+            "style": [4, 8]
+        }
+    },
+    {
+        "model": "mentorapp.mentor",
+        "pk": 7,
+        "fields": {
+            "username": "はるき",
+            "profile_image": "images/mentor_profiles/testdata/haruki.jpg",
+            "self_introduction": "ファッションコーディネートに真剣に向き合っているはるきです。\n私はストリートファッションが得意で、特にデイリーで使いやすいアイテムを取り入れたコーディネートを提供しています。\n他の人と一味違うファッションを楽しみましょう。",
+            "style": [3, 9]
+        }
+    },
+    {
+        "model": "mentorapp.mentor",
+        "pk": 8,
+        "fields": {
+            "username": "たつや",
+            "profile_image": "images/mentor_profiles/testdata/tatsuya.jpg",
+            "self_introduction": "こんにちは、たつやです。私はフォーマルとカジュアルをミックスしたスタイルが得意で、洗練された印象を与えるコーディネートを提案しています。\nシンプルでありながらも、どこか遊び心を持たせたスタイリングで日常を彩りましょう。",
+            "style": [2, 7, 12]
+        }
+    },
+    {
+        "model": "mentorapp.mentor",
+        "pk": 9,
+        "fields": {
+            "username": "こうた",
+            "profile_image": "images/mentor_profiles/testdata/kota.jpg",
+            "self_introduction": "こうたです。私はミリタリーやアウトドアスタイルにこだわったコーディネートを提案します。\nアクティブなライフスタイルに合うファッションで、どんな場面でも自分らしさを発揮できるスタイリングをお任せください。",
+            "style": [9, 10, 11]
+        }
+    },
+    {
+        "model": "mentorapp.mentor",
+        "pk": 10,
+        "fields": {
+            "username": "ゆうた",
+            "profile_image": "images/mentor_profiles/testdata/yuta.jpg",
+            "self_introduction": "ファッションを通して自分の個性を表現したい方におすすめのメンター、ゆうたです。\n私はモード系のスタイルが得意で、都会的で洗練されたスタイリングを提供します。\n普段とは違う自分を演出したい方にぴったりのコーディネートを一緒に探しましょう。",
+            "style": [7, 8]
+        }
+    }
+]

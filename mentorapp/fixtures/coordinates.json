@@ -1,0 +1,182 @@
+[
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 1,
+        "fields": {
+            "name": "洗練された大人のリラックスカジュアル",
+            "image": "images/coordinates/testdata/coordinate_1.jpg",
+            "mentor": 1
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 2,
+        "fields": {
+            "name": "遊び心溢れるストリートファッション",
+            "image": "images/coordinates/testdata/coordinate_2.jpg",
+            "mentor": 1
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 3,
+        "fields": {
+            "name": "クールでシャープなモダンフォーマル",
+            "image": "images/coordinates/testdata/coordinate_3.jpg",
+            "mentor": 2
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 4,
+        "fields": {
+            "name": "アーバンスタイルのスポーティエレガンス",
+            "image": "images/coordinates/testdata/coordinate_4.jpg",
+            "mentor": 2
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 5,
+        "fields": {
+            "name": "ナチュラル素材で魅せるアウトドアスタイル",
+            "image": "images/coordinates/testdata/coordinate_5.jpg",
+            "mentor": 3
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 6,
+        "fields": {
+            "name": "ミリタリーテイストのワークスタイル",
+            "image": "images/coordinates/testdata/coordinate_6.jpg",
+            "mentor": 3
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 7,
+        "fields": {
+            "name": "クラシックモードの都会派スタイル",
+            "image": "images/coordinates/testdata/coordinate_7.jpg",
+            "mentor": 4
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 8,
+        "fields": {
+            "name": "爽やかさを演出するカジュアルフォーマル",
+            "image": "images/coordinates/testdata/coordinate_8.jpg",
+            "mentor": 4
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 9,
+        "fields": {
+            "name": "レイヤードで魅せるクールストリート",
+            "image": "images/coordinates/testdata/coordinate_9.jpg",
+            "mentor": 5
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 10,
+        "fields": {
+            "name": "自然体で着こなすラフスタイル",
+            "image": "images/coordinates/testdata/coordinate_10.jpg",
+            "mentor": 5
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 11,
+        "fields": {
+            "name": "シンプルエレガンスを演出するスリムコーデ",
+            "image": "images/coordinates/testdata/coordinate_11.jpg",
+            "mentor": 6
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 12,
+        "fields": {
+            "name": "リラックス感あふれるミリタリースタイル",
+            "image": "images/coordinates/testdata/coordinate_12.jpg",
+            "mentor": 6
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 13,
+        "fields": {
+            "name": "都会的なフォーマルルック",
+            "image": "images/coordinates/testdata/coordinate_13.jpg",
+            "mentor": 7
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 14,
+        "fields": {
+            "name": "シンプルに決めるストリートスタイル",
+            "image": "images/coordinates/testdata/coordinate_14.jpg",
+            "mentor": 7
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 15,
+        "fields": {
+            "name": "モード系カジュアルの最先端",
+            "image": "images/coordinates/testdata/coordinate_15.jpg",
+            "mentor": 8
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 16,
+        "fields": {
+            "name": "エッジの効いたシティスタイル",
+            "image": "images/coordinates/testdata/coordinate_16.jpg" ,
+            "mentor": 8     
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 17,
+        "fields": {
+            "name": "カジュアルに着こなすデイリーファッション",
+            "image": "images/coordinates/testdata/coordinate_17.jpg",
+            "mentor": 9
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 18,
+        "fields": {
+            "name": "シックなスタイルを楽しむ都会派コーデ",
+            "image": "images/coordinates/testdata/coordinate_18.jpg",
+            "mentor": 9
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 19,
+        "fields": {
+            "name": "モードでスタイリッシュな休日スタイル",
+            "image": "images/coordinates/testdata/coordinate_19.jpg",
+            "mentor": 10
+        }
+    },
+    {
+        "model": "mentorapp.coordinate",
+        "pk": 20,
+        "fields": {
+            "name": "ナチュラルに着こなすアウトドアコーデ",
+            "image": "images/coordinates/testdata/coordinate_20.jpg",
+            "mentor": 10
+        }
+    }
+]

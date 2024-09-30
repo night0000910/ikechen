@@ -1,0 +1,114 @@
+[
+    {
+        "model": "mentorapp.style",
+        "pk": 1,
+        "fields": {
+            "name": "ナチュラル"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 2,
+        "fields": {
+            "name": "コンサバ"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 3,
+        "fields": {
+            "name": "キレイめ"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 4,
+        "fields": {
+            "name": "カジュアル"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 5,
+        "fields": {
+            "name": "可愛い系"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 6,
+        "fields": {
+            "name": "フォーマル"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 7,
+        "fields": {
+            "name": "クール"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 8,
+        "fields": {
+            "name": "モード"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 9,
+        "fields": {
+            "name": "ストリート"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 10,
+        "fields": {
+            "name": "アウトドア"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 11,
+        "fields": {
+            "name": "ワークスタイル"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 12,
+        "fields": {
+            "name": "ミリタリー"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 13,
+        "fields": {
+            "name": "ロック"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 14,
+        "fields": {
+            "name": "スポーティ"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 15,
+        "fields": {
+            "name": "古着"
+        }
+    },
+    {
+        "model": "mentorapp.style",
+        "pk": 16,
+        "fields": {
+            "name": "韓国系"
+        }
+    }
+]

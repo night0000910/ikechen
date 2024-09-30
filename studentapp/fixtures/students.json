@@ -1,0 +1,26 @@
+[
+    {
+        "model": "studentapp.student",
+        "pk": 1,
+        "fields": {
+            "username": "たぬきち",
+            "profile_image": "images/student_profiles/testdata/tanukichi.jpg"
+        }
+    },
+    {
+        "model": "studentapp.student",
+        "pk": 2,
+        "fields": {
+            "username": "ミカヅキ",
+            "profile_image": "images/student_profiles/testdata/mikazuki.jpg"
+        }
+    },
+    {
+        "model": "studentapp.student",
+        "pk": 3,
+        "fields": {
+            "username": "風見鶏",
+            "profile_image": "images/student_profiles/testdata/kazamidori.jpg"
+        }
+    }
+]
